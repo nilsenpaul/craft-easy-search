@@ -133,38 +133,92 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
       hudIsVisible: false,
       availableFields: [{
-        handle: 'title',
-        label: 'Title'
+        handle: "--any--",
+        label: "Any field"
       }, {
-        handle: 'testField',
-        label: 'Test field'
+        handle: "title",
+        label: "Title"
+      }, {
+        handle: "testField",
+        label: "Test field"
       }],
       availableOperators: [{
-        key: 'equal',
-        value: 'is equal to',
-        search: '{fieldHandle}:{value}'
+        key: "contains",
+        value: "contains",
+        fieldSearch: "{fieldHandle}:{value}",
+        globalSearch: "{value}",
+        showValueField: true,
+        needsSpecificField: false
       }, {
-        key: 'notEqual',
-        value: 'is not equal to',
-        search: '-{fieldHandle}:{value}'
+        key: "notContains",
+        value: "does not contain",
+        fieldSearch: "-{fieldHandle}:{value}",
+        globalSearch: "-{value}",
+        showValueField: true,
+        needsSpecificField: false
       }, {
-        key: 'empty',
-        value: 'is empty',
-        search: '-{fieldHandle}:*'
+        key: "equal",
+        value: "is equal to",
+        fieldSearch: "{fieldHandle}::{value}",
+        globalSearch: '"{value}"',
+        showValueField: true,
+        needsSpecificField: false
       }, {
-        key: 'notempty',
-        value: 'is not empty',
-        search: '{fieldHandle}:*'
+        key: "notEqual",
+        value: "is not equal to",
+        fieldSearch: "-{fieldHandle}::{value}",
+        globalSearch: '-"{value}"',
+        showValueField: true,
+        needsSpecificField: false
+      }, {
+        key: "empty",
+        value: "is empty",
+        fieldSearch: "-{fieldHandle}:*",
+        showValueField: false,
+        needsSpecificField: true
+      }, {
+        key: "notempty",
+        value: "is not empty",
+        fieldSearch: "{fieldHandle}:*",
+        showValueField: false,
+        needsSpecificField: true
       }],
       input: [{
-        handle: 'testField',
-        operator: '=',
-        value: 'paul'
+        handle: "--any--",
+        operator: "contains",
+        value: ""
       }]
     };
   },
@@ -177,31 +231,34 @@ __webpack_require__.r(__webpack_exports__);
       Craft.elementIndex.updateElements();
     },
     buildSearchQuery: function buildSearchQuery() {
-      var searchQuery = '';
+      var searchQuery = "";
 
       for (var i = 0; i < this.input.length; i++) {
         var row = this.input[i];
 
         if (i !== 0) {
-          searchQuery += ' ';
+          searchQuery += " ";
         }
 
-        var searchString = this.getOperatorByKey(row.operator).search;
+        var operator = this.getOperatorByKey(row.operator);
+        var searchString = row.handle == "--any--" ? operator.globalSearch : operator.fieldSearch;
+        searchString = searchString.replace("{value}", row.value);
+        searchString = searchString.replace("{fieldHandle}", row.handle);
         searchQuery += searchString;
       }
 
       return searchQuery;
     },
     getOperatorByKey: function getOperatorByKey(key) {
-      for (var i = 0; i < this.availableOperators; i++) {
+      for (var i = 0; i < this.availableOperators.length; i++) {
         var operator = this.availableOperators[i];
 
         if (operator.key == key) {
           return operator;
         }
-
-        return null;
       }
+
+      return null;
     }
   }
 });
@@ -744,137 +801,144 @@ var render = function() {
                     ]),
                     _vm._v(" "),
                     _vm._l(_vm.input, function(item, i) {
-                      return _c("div", { staticClass: "input field-group" }, [
-                        _c("div", { staticClass: "input" }, [
-                          _c("div", { staticClass: "select fullwidth" }, [
-                            _c(
-                              "select",
-                              {
-                                directives: [
-                                  {
-                                    name: "model",
-                                    rawName: "v-model",
-                                    value: _vm.input[i].handle,
-                                    expression: "input[i].handle"
+                      return _c("div", { staticClass: "input" }, [
+                        _c("div", { staticClass: "field-row" }, [
+                          _c("div", { staticClass: "input" }, [
+                            _c("div", { staticClass: "select fullwidth" }, [
+                              _c(
+                                "select",
+                                {
+                                  directives: [
+                                    {
+                                      name: "model",
+                                      rawName: "v-model",
+                                      value: _vm.input[i].handle,
+                                      expression: "input[i].handle"
+                                    }
+                                  ],
+                                  on: {
+                                    change: function($event) {
+                                      var $$selectedVal = Array.prototype.filter
+                                        .call($event.target.options, function(
+                                          o
+                                        ) {
+                                          return o.selected
+                                        })
+                                        .map(function(o) {
+                                          var val =
+                                            "_value" in o ? o._value : o.value
+                                          return val
+                                        })
+                                      _vm.$set(
+                                        _vm.input[i],
+                                        "handle",
+                                        $event.target.multiple
+                                          ? $$selectedVal
+                                          : $$selectedVal[0]
+                                      )
+                                    }
                                   }
-                                ],
-                                on: {
-                                  change: function($event) {
-                                    var $$selectedVal = Array.prototype.filter
-                                      .call($event.target.options, function(o) {
-                                        return o.selected
-                                      })
-                                      .map(function(o) {
-                                        var val =
-                                          "_value" in o ? o._value : o.value
-                                        return val
-                                      })
-                                    _vm.$set(
-                                      _vm.input[i],
-                                      "handle",
-                                      $event.target.multiple
-                                        ? $$selectedVal
-                                        : $$selectedVal[0]
-                                    )
-                                  }
-                                }
-                              },
-                              [
-                                _c(
-                                  "option",
-                                  {
-                                    attrs: { value: "" },
-                                    domProps: { selected: true }
-                                  },
-                                  [_vm._v("Select a field handle")]
-                                ),
-                                _vm._v(" "),
+                                },
                                 _vm._l(_vm.availableFields, function(field) {
                                   return _c(
                                     "option",
                                     { domProps: { value: field.handle } },
                                     [_vm._v(_vm._s(field.label))]
                                   )
-                                })
-                              ],
-                              2
-                            )
-                          ])
-                        ]),
-                        _vm._v(" "),
-                        _c("div", { staticClass: "input" }, [
-                          _c("div", { staticClass: "select fullwidth" }, [
-                            _c(
-                              "select",
-                              {
-                                directives: [
-                                  {
-                                    name: "model",
-                                    rawName: "v-model",
-                                    value: _vm.input[i].operator,
-                                    expression: "input[i].operator"
-                                  }
-                                ],
-                                on: {
-                                  change: function($event) {
-                                    var $$selectedVal = Array.prototype.filter
-                                      .call($event.target.options, function(o) {
-                                        return o.selected
-                                      })
-                                      .map(function(o) {
-                                        var val =
-                                          "_value" in o ? o._value : o.value
-                                        return val
-                                      })
-                                    _vm.$set(
-                                      _vm.input[i],
-                                      "operator",
-                                      $event.target.multiple
-                                        ? $$selectedVal
-                                        : $$selectedVal[0]
-                                    )
-                                  }
-                                }
-                              },
-                              _vm._l(_vm.availableOperators, function(
-                                operator
-                              ) {
-                                return _c(
-                                  "option",
-                                  { domProps: { value: operator.key } },
-                                  [_vm._v(_vm._s(operator.value))]
-                                )
-                              }),
-                              0
-                            )
-                          ])
-                        ]),
-                        _vm._v(" "),
-                        _vm.input[i].operator == "equal"
-                          ? _c("div", { staticClass: "input" }, [
-                              _c("input", {
-                                directives: [
-                                  {
-                                    name: "model",
-                                    rawName: "v-model",
-                                    value: item.value,
-                                    expression: "item.value"
-                                  }
-                                ],
-                                staticClass: "text nicetext fullwidth",
-                                attrs: { type: "text" },
-                                domProps: { value: item.value },
-                                on: {
-                                  input: function($event) {
-                                    if ($event.target.composing) {
-                                      return
-                                    }
-                                    _vm.$set(item, "value", $event.target.value)
-                                  }
-                                }
-                              })
+                                }),
+                                0
+                              )
                             ])
-                          : _vm._e()
+                          ])
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "fieldrow" }, [
+                          _c("div", { staticClass: "flex" }, [
+                            _c("div", { staticClass: "input" }, [
+                              _c("div", { staticClass: "select" }, [
+                                _c(
+                                  "select",
+                                  {
+                                    directives: [
+                                      {
+                                        name: "model",
+                                        rawName: "v-model",
+                                        value: _vm.input[i].operator,
+                                        expression: "input[i].operator"
+                                      }
+                                    ],
+                                    on: {
+                                      change: function($event) {
+                                        var $$selectedVal = Array.prototype.filter
+                                          .call($event.target.options, function(
+                                            o
+                                          ) {
+                                            return o.selected
+                                          })
+                                          .map(function(o) {
+                                            var val =
+                                              "_value" in o ? o._value : o.value
+                                            return val
+                                          })
+                                        _vm.$set(
+                                          _vm.input[i],
+                                          "operator",
+                                          $event.target.multiple
+                                            ? $$selectedVal
+                                            : $$selectedVal[0]
+                                        )
+                                      }
+                                    }
+                                  },
+                                  _vm._l(_vm.availableOperators, function(
+                                    operator
+                                  ) {
+                                    return !operator.needsSpecificField ||
+                                      _vm.input[i].handle !== "--any--"
+                                      ? _c(
+                                          "option",
+                                          { domProps: { value: operator.key } },
+                                          [_vm._v(_vm._s(operator.value))]
+                                        )
+                                      : _vm._e()
+                                  }),
+                                  0
+                                )
+                              ])
+                            ]),
+                            _vm._v(" "),
+                            _vm.getOperatorByKey(_vm.input[i].operator)
+                              .showValueField
+                              ? _c("div", { staticClass: "input input-grow" }, [
+                                  _c("input", {
+                                    directives: [
+                                      {
+                                        name: "model",
+                                        rawName: "v-model",
+                                        value: item.value,
+                                        expression: "item.value"
+                                      }
+                                    ],
+                                    staticClass: "text nicetext fullwidth",
+                                    attrs: { type: "text" },
+                                    domProps: { value: item.value },
+                                    on: {
+                                      input: function($event) {
+                                        if ($event.target.composing) {
+                                          return
+                                        }
+                                        _vm.$set(
+                                          item,
+                                          "value",
+                                          $event.target.value
+                                        )
+                                      }
+                                    }
+                                  })
+                                ])
+                              : _vm._e()
+                          ])
+                        ])
                       ])
                     })
                   ],
