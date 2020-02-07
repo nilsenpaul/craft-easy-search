@@ -1,0 +1,45 @@
+{
+    "name": "nilsenpaul/craft-easy-search",
+    "description": "Easy Search lets content editors 'build' search queries in Craft's control panel.",
+    "type": "craft-plugin",
+    "version": "1.0.0",
+    "keywords": [
+        "craft",
+        "cms",
+        "craftcms",
+        "craft-plugin",
+        "search",
+        "cp",
+        "query"
+    ],
+    "support": {
+        "docs": "https://github.com/nilsenpaul/craft-easy-search/easy-search/blob/master/README.md",
+        "issues": "https://github.com/nilsenpaul/craft-easy-search/easy-search/issues"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "nils&paul",
+            "homepage": "https://nilsenpaul.nl"
+        }
+    ],
+    "require": {
+        "craftcms/cms": "^3.0.0-RC1"
+    },
+    "autoload": {
+        "psr-4": {
+          "nilsenpaul\\easysearch\\": "src/"
+        }
+    },
+    "extra": {
+        "name": "Easy Search",
+        "handle": "easy-search",
+        "hasCpSettings": false,
+        "hasCpSection": false,
+        "changelogUrl": "https://raw.githubusercontent.com/nilsenpaul/craft-easy-search/easy-search/master/CHANGELOG.md",
+        "components": {
+            "easySearchService": "nilsenpaul\\easysearch\\services\\EasySearchService"
+        },
+        "class": "nilsenpaul\\easysearch\\EasySearch"
+    }
+}

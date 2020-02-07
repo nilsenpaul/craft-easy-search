@@ -1,0 +1,77 @@
+.easy-search__container {
+  position: absolute;
+  top: 50%;
+  right: 0.5rem;
+  height: 16px;
+  transform: translateY(-50%);
+}
+
+body.rtl .easy-search__container {
+  right: initial;
+  left: 0.5rem;
+}
+
+.easy-search__button {
+  width: 16px;
+  height: 16px;
+  color: #0B69A3;
+  cursor: pointer;
+}
+
+.easy-search__hud {
+  display: block;
+  position: absolute;
+  z-index: 100;
+  box-sizing: border-box;
+  top: calc(20px + 100%);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 300px;
+}
+
+.easy-search__hud-shade {
+  z-index: 100;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.easy-search__hud .tip {
+  position: absolute;
+  z-index: 101;
+  background: no-repeat 0 0;
+  left: 50%;
+  transform: translateX(-50%);
+  top: -15px;
+  width: 30px;
+  height: 15px;
+  /* TODO: add hudtip image */
+}
+
+.easy-search__hud .body {
+  border-radius: 5px;
+  overflow: hidden;
+  background-color: #fff;
+  box-shadow: 0 25px 100px rgba(31, 41, 51, 0.5);
+}
+
+.easy-search__hud .main {
+  padding: 24px;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.easy-search__hud .heading {
+  margin-bottom: 1rem !important;
+}
+
+body.ltr .texticon .clear {
+  right: 32px;
+}
+
+body.rtl .texticon .clear {
+  left: 32px;
+}
+
