@@ -23,36 +23,191 @@ use craft\web\Controller;
 class DefaultController extends Controller
 {
 
-    // Protected Properties
-    // =========================================================================
-
-    /**
-     * @var    bool|array Allows anonymous access to this controller's actions.
-     *         The actions must be in 'kebab-case'
-     * @access protected
-     */
-    protected $allowAnonymous = ['index', 'do-something'];
-
     // Public Methods
     // =========================================================================
 
     /**
      * @return mixed
      */
-    public function actionIndex()
+    public function actionGetAvailableFields($elementType, $source)
     {
-        $result = 'Welcome to the DefaultController actionIndex() method';
+        $element = new $elementType;
+        
+        $fieldsToReturn = [];
+        switch ($elementType) {
+            case 'craft\\elements\\Entry':
+                $fieldsToReturn += $this->getEntryFields($element, $source);
+                break;
+            case 'craft\\elements\\Category':
+                $fieldsToReturn = $this->getCategoryFields($element, $source);
+                break;
+            case 'craft\\elements\\Asset':
+                $fieldsToReturn = $this->getAssetFields($element, $source);
+                break;
+            case 'craft\\elements\\User':
+                $fieldsToReturn = $this->getUserFields($element, $source);
+                break;
+        }
 
-        return $result;
+        return $this->asJson(array_merge([
+            [
+                'handle' => "--any--",
+                'label' => Craft::t('easy-search', 'Any field'),
+            ],
+        ], $fieldsToReturn));
     }
 
-    /**
-     * @return mixed
-     */
-    public function actionDoSomething()
+    protected function getEntryFields($element, $source)
     {
-        $result = 'Welcome to the DefaultController actionDoSomething() method';
+        $sectionsAndEntryTypes = [];
 
-        return $result;
+        // Do we need all sections, or just one?
+        if ($source === '*') {
+            foreach (Craft::$app->getSections()->getAllSections() as $section) {
+                foreach (Craft::$app->getSections()->getEntryTypesBySectionId($section->id) as $entryType) {
+                    $sectionsAndEntryTypes[$section->id][] = $entryType->id;
+                }
+            }
+        } else {
+            $sectionUid = str_replace('section:', '', $source);
+            $section = Craft::$app->getSections()->getSectionByUid($sectionUid);
+            foreach (Craft::$app->getSections()->getEntryTypesBySectionId($section->id) as $entryType) {
+                $sectionsAndEntryTypes[$section->id][] = $entryType->id;
+            }
+        }
+        
+        // Get all searchable fields for the sections and entry types we found
+        foreach ($sectionsAndEntryTypes as $sectionId => $entryTypes) {
+            foreach ($entryTypes as $entryTypeId) {
+                $element->sectionId = $sectionId;
+                $element->typeId = $entryTypeId;
+
+                if ($element::hasContent() && ($fieldLayout = $element->getFieldLayout()) !== null) {
+                    foreach ($fieldLayout->getFields() as $field) {
+                        if ($field->searchable) {
+                            $fieldsToReturn[] = [
+                                'handle' => $field->handle,
+                                'label' => $field->name,
+                            ];
+                        }
+                    }
+                }
+            }
+        }
+
+        return array_merge([
+            [
+                'handle' => 'title',
+                'label' => Craft::t('app', 'Title'),
+            ],
+            [
+                'handle' => 'slug',
+                'label' => Craft::t('app', 'Slug'),
+            ],
+        ], $fieldsToReturn);
+    }
+
+    protected function getUserFields($element, $source)
+    {
+        $fieldsToReturn = [];
+        if ($element::hasContent() && ($fieldLayout = $element->getFieldLayout()) !== null) {
+            foreach ($fieldLayout->getFields() as $field) {
+                if ($field->searchable) {
+                    $fieldsToReturn[] = [
+                        'handle' => $field->handle,
+                        'label' => $field->name,
+                    ];
+                }
+            }
+        }
+
+        return array_merge([
+            [
+                'handle' => 'username',
+                'label' => Craft::t('app', 'Username'),
+            ],
+            [
+                'handle' => 'firstName',
+                'label' => Craft::t('app', 'First Name'),
+            ],
+            [
+                'handle' => 'lastName',
+                'label' => Craft::t('app', 'Last Name'),
+            ],
+            [
+                'handle' => 'fullName',
+                'label' => Craft::t('app', 'Full Name'),
+            ],
+            [
+                'handle' => 'email',
+                'label' => Craft::t('app', 'Email'),
+            ],
+        ], $fieldsToReturn);
+    }
+
+    protected function getCategoryFields($element, $source)
+    {
+        $groupUid = str_replace('group:', '', $source);
+        $element->groupId = Craft::$app->getCategories()->getGroupByUid($groupUid)->id;
+
+        $fieldsToReturn = [];
+        if ($element::hasContent() && ($fieldLayout = $element->getFieldLayout()) !== null) {
+            foreach ($fieldLayout->getFields() as $field) {
+                if ($field->searchable) {
+                    $fieldsToReturn[] = [
+                        'handle' => $field->handle,
+                        'label' => $field->name,
+                    ];
+                }
+            }
+        }
+
+        return array_merge([
+            [
+                'handle' => 'title',
+                'label' => Craft::t('app', 'Title'),
+            ],
+            [
+                'handle' => 'slug',
+                'label' => Craft::t('app', 'Slug'),
+            ],
+        ], $fieldsToReturn);
+    }
+
+    protected function getAssetFields($element, $source)
+    {
+        $folderUid = str_replace('folder:', '', $source);        
+        $element->volumeId = Craft::$app->getAssets()->getFolderByUid($folderUid)->volumeId;
+
+        $fieldsToReturn = [];
+        if ($element::hasContent() && ($fieldLayout = $element->getFieldLayout()) !== null) {
+            foreach ($fieldLayout->getFields() as $field) {
+                if ($field->searchable) {
+                    $fieldsToReturn[] = [
+                        'handle' => $field->handle,
+                        'label' => $field->name,
+                    ];
+                }
+            }
+        }
+
+        return array_merge([
+            [
+                'handle' => 'title',
+                'label' => Craft::t('app', 'Title'),
+            ],
+            [
+                'handle' => 'filename',
+                'label' => Craft::t('app', 'Filename'),
+            ],
+            [
+                'handle' => 'extension',
+                'label' => Craft::t('easy-search', 'Extension'),
+            ],
+            [
+                'handle' => 'kind',
+                'label' => Craft::t('easy-search', 'Kind'),
+            ],
+        ], $fieldsToReturn);
     }
 }

@@ -88,6 +88,9 @@ class EasySearch extends Plugin
             'is not equal to',
             'is empty',
             'is not empty',
+            'Add a condition',
+            'and',
+            'or',
         ]);
     }
 }

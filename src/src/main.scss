@@ -8,6 +8,7 @@ $npRed: #ff4136;
         right: 0.5rem;
         height: $iconSize;
         transform: translateY(-50%);
+        z-index: 200;
 
         body.rtl & {
             right: initial;
@@ -25,12 +26,17 @@ $npRed: #ff4136;
     &__hud {
         display: block;
         position: absolute;
-        z-index: 100;
+        text-align: center;
+        z-index: 1000;
         box-sizing: border-box;        
         top: calc(20px + 100%);
         left: 50%;
         transform: translateX(-50%);
         width: 300px;
+
+        @media (max-width: 400px) { 
+            transform: translateX(-100%);
+        }
 
         &-shade {
             z-index: 100;
@@ -41,9 +47,13 @@ $npRed: #ff4136;
             height: 100%;
         }
 
+        .condition {
+            margin: 12px 0 0 0;
+        }
+
         .tip {
             position: absolute;
-            z-index: 101;
+            z-index: 200;
             background: no-repeat 0 0;
             left: 50%;
             transform: translateX(-50%);
@@ -92,10 +102,27 @@ $npRed: #ff4136;
             flex: 5;
         }
 
-        .select, select {
-            width: 100%;
+        .add-btn {
+            appearance: none;
+            border: 0;
+            background-color: #3D9970;
+            color: #fff;
+            font-weight: bold;
+            padding: 4px 6px;
+            border-radius: 2px;
+            margin: 12px 0 0;
+            cursor: pointer;
         }
+
+        .and-or-or {
+            margin: 0 0 12px 0;
+        }
+        
     }
+}
+
+body.ltr #header .flex:not(:last-child) {
+    margin-right: 0;
 }
 
 body.ltr .texticon .clear {

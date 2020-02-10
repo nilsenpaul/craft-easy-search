@@ -20,6 +20,11 @@ return [
     'does not contain' => 'bevat niet',
     'is equal to' => 'is gelijk aan',
     'is not equal to' => 'is niet gelijk aan',
-    'is empty' => 'heeft geen waarde',
-    'is not empty' => 'heeft een waarde',
+    'is empty' => 'is leeg',
+    'is not empty' => 'is niet leeg',
+    'Add a condition' => 'Conditie toevoegen',
+    'and' => 'en',
+    'or' => 'of',
+    'Extension' => 'Extensie',
+    'Kind' => 'Bestandstype',
 ];
