@@ -5,19 +5,16 @@
   height: 16px;
   transform: translateY(-50%);
 }
-
 body.rtl .easy-search__container {
   right: initial;
   left: 0.5rem;
 }
-
 .easy-search__button {
   width: 16px;
   height: 16px;
-  color: #0B69A3;
+  color: #ff4136;
   cursor: pointer;
 }
-
 .easy-search__hud {
   display: block;
   position: absolute;
@@ -28,7 +25,6 @@ body.rtl .easy-search__container {
   transform: translateX(-50%);
   width: 300px;
 }
-
 .easy-search__hud-shade {
   z-index: 100;
   position: fixed;
@@ -37,7 +33,6 @@ body.rtl .easy-search__container {
   width: 100%;
   height: 100%;
 }
-
 .easy-search__hud .tip {
   position: absolute;
   z-index: 101;
@@ -47,24 +42,39 @@ body.rtl .easy-search__container {
   top: -15px;
   width: 30px;
   height: 15px;
-  /* TODO: add hudtip image */
+  background-image: url("hudtip_top.png");
 }
-
 .easy-search__hud .body {
   border-radius: 5px;
   overflow: hidden;
   background-color: #fff;
   box-shadow: 0 25px 100px rgba(31, 41, 51, 0.5);
 }
-
 .easy-search__hud .main {
   padding: 24px;
   overflow: hidden;
   box-sizing: border-box;
 }
-
 .easy-search__hud .heading {
   margin-bottom: 1rem !important;
+}
+.easy-search__hud .field-row {
+  margin-bottom: 7px;
+}
+.easy-search__hud .input-important {
+  width: 55%;
+}
+.easy-search__hud .input-grow {
+  flex-grow: 1;
+}
+.easy-search__hud .input input {
+  padding-left: 9px !important;
+}
+.easy-search__hud .flex-full {
+  flex: 5;
+}
+.easy-search__hud .select, .easy-search__hud select {
+  width: 100%;
 }
 
 body.ltr .texticon .clear {
@@ -74,4 +84,3 @@ body.ltr .texticon .clear {
 body.rtl .texticon .clear {
   left: 32px;
 }
-

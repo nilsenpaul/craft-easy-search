@@ -1,4 +1,5 @@
 $iconSize: 16px;
+$npRed: #ff4136;
 
 .easy-search {
     &__container {
@@ -17,7 +18,7 @@ $iconSize: 16px;
     &__button {
         width: $iconSize;
         height: $iconSize;
-        color: #0B69A3;
+        color: $npRed;
         cursor: pointer;
     }
 
@@ -49,7 +50,7 @@ $iconSize: 16px;
             top: -15px;
             width: 30px;
             height: 15px;
-            /* TODO: add hudtip image */
+            background-image: url('hudtip_top.png');
         }
 
         .body {
@@ -67,6 +68,32 @@ $iconSize: 16px;
 
         .heading {
             margin-bottom: 1rem !important;
+        }
+
+        .field-row {
+            margin-bottom: 7px;
+        }
+
+        .input {
+            &-important {
+                width: 55%;
+            }
+
+            &-grow {
+                flex-grow: 1;
+            }
+
+            input {
+                padding-left: 9px !important;
+            }
+        }
+
+        .flex-full {
+            flex: 5;
+        }
+
+        .select, select {
+            width: 100%;
         }
     }
 }

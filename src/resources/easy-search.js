@@ -163,10 +163,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
+      elementType: null,
       hudIsVisible: false,
+      currentSearchQuery: '',
       availableFields: [{
         handle: "--any--",
-        label: "Any field"
+        label: this.getTranslated("Any field")
       }, {
         handle: "title",
         label: "Title"
@@ -176,43 +178,43 @@ __webpack_require__.r(__webpack_exports__);
       }],
       availableOperators: [{
         key: "contains",
-        value: "contains",
+        value: this.getTranslated('contains'),
         fieldSearch: "{fieldHandle}:{value}",
         globalSearch: "{value}",
-        showValueField: true,
+        needsValueField: true,
         needsSpecificField: false
       }, {
         key: "notContains",
-        value: "does not contain",
+        value: this.getTranslated('does not contain'),
         fieldSearch: "-{fieldHandle}:{value}",
         globalSearch: "-{value}",
-        showValueField: true,
+        needsValueField: true,
         needsSpecificField: false
       }, {
         key: "equal",
-        value: "is equal to",
+        value: this.getTranslated('is equal to'),
         fieldSearch: "{fieldHandle}::{value}",
         globalSearch: '"{value}"',
-        showValueField: true,
+        needsValueField: true,
         needsSpecificField: false
       }, {
         key: "notEqual",
-        value: "is not equal to",
+        value: this.getTranslated('is not equal to'),
         fieldSearch: "-{fieldHandle}::{value}",
         globalSearch: '-"{value}"',
-        showValueField: true,
+        needsValueField: true,
         needsSpecificField: false
       }, {
         key: "empty",
-        value: "is empty",
+        value: this.getTranslated('is empty'),
         fieldSearch: "-{fieldHandle}:*",
-        showValueField: false,
+        needsValueField: false,
         needsSpecificField: true
       }, {
         key: "notempty",
-        value: "is not empty",
+        value: this.getTranslated('is not empty'),
         fieldSearch: "{fieldHandle}:*",
-        showValueField: false,
+        needsValueField: false,
         needsSpecificField: true
       }],
       input: [{
@@ -222,29 +224,40 @@ __webpack_require__.r(__webpack_exports__);
       }]
     };
   },
-  mounted: function mounted() {},
+  mounted: function mounted() {
+    this.populateAvailableFields();
+  },
   methods: {
+    toggleHud: function toggleHud() {
+      this.hudIsVisible = !this.hudIsVisible;
+    },
     updateSearchInput: function updateSearchInput() {
       var searchQuery = this.buildSearchQuery();
-      window.searchInput.value = searchQuery;
-      Craft.elementIndex.searchText = searchQuery;
-      Craft.elementIndex.updateElements();
+
+      if (searchQuery != this.currentSearchQuery) {
+        window.searchInput.value = searchQuery;
+        Craft.elementIndex.searchText = searchQuery;
+        Craft.elementIndex.updateElements();
+        this.currentSearchQuery = searchQuery;
+      }
     },
     buildSearchQuery: function buildSearchQuery() {
       var searchQuery = "";
 
       for (var i = 0; i < this.input.length; i++) {
         var row = this.input[i];
-
-        if (i !== 0) {
-          searchQuery += " ";
-        }
-
         var operator = this.getOperatorByKey(row.operator);
-        var searchString = row.handle == "--any--" ? operator.globalSearch : operator.fieldSearch;
-        searchString = searchString.replace("{value}", row.value);
-        searchString = searchString.replace("{fieldHandle}", row.handle);
-        searchQuery += searchString;
+
+        if (!operator.needsValueField || row.value !== '') {
+          if (searchQuery === "") {
+            searchQuery += " ";
+          }
+
+          var searchString = row.handle == "--any--" ? operator.globalSearch : operator.fieldSearch;
+          searchString = searchString.replace("{value}", row.value);
+          searchString = searchString.replace("{fieldHandle}", row.handle);
+          searchQuery += searchString;
+        }
       }
 
       return searchQuery;
@@ -259,6 +272,17 @@ __webpack_require__.r(__webpack_exports__);
       }
 
       return null;
+    },
+    getTranslated: function getTranslated(string) {
+      return Craft.t('easy-search', string);
+    },
+    populateAvailableFields: function populateAvailableFields() {
+      // First, get the element type
+      this.elementType = Craft.elementIndex !== undefined && Craft.elementIndex.elementType !== undefined ? Craft.elementIndex.elementType : null;
+
+      if (this.elementType) {
+        console.log(this.elementType);
+      }
     }
   }
 });
@@ -762,11 +786,7 @@ var render = function() {
           xmlns: "http://www.w3.org/2000/svg",
           viewBox: "0 0 512 512"
         },
-        on: {
-          click: function($event) {
-            _vm.hudIsVisible = !_vm.hudIsVisible
-          }
-        }
+        on: { click: _vm.toggleHud }
       },
       [
         _c("path", {
@@ -787,37 +807,37 @@ var render = function() {
       ? _c("div", { staticClass: "easy-search__hud" }, [
           _c("div", { staticClass: "tip tip-top" }),
           _vm._v(" "),
-          _c(
-            "form",
-            { staticClass: "body", on: { change: _vm.updateSearchInput } },
-            [
-              _c("div", { staticClass: "main-container" }, [
-                _c(
-                  "div",
-                  { staticClass: "main" },
-                  [
-                    _c("h3", { staticClass: "heading" }, [
-                      _vm._v("Build your search query:")
-                    ]),
-                    _vm._v(" "),
-                    _vm._l(_vm.input, function(item, i) {
-                      return _c("div", { staticClass: "input" }, [
-                        _c("div", { staticClass: "field-row" }, [
-                          _c("div", { staticClass: "input" }, [
-                            _c("div", { staticClass: "select fullwidth" }, [
-                              _c(
-                                "select",
-                                {
-                                  directives: [
-                                    {
-                                      name: "model",
-                                      rawName: "v-model",
-                                      value: _vm.input[i].handle,
-                                      expression: "input[i].handle"
-                                    }
-                                  ],
-                                  on: {
-                                    change: function($event) {
+          _c("form", { staticClass: "body" }, [
+            _c("div", { staticClass: "main-container" }, [
+              _c(
+                "div",
+                { staticClass: "main" },
+                [
+                  _c("h3", { staticClass: "heading" }, [
+                    _vm._v(
+                      _vm._s(_vm.getTranslated("Build a search query")) + ":"
+                    )
+                  ]),
+                  _vm._v(" "),
+                  _vm._l(_vm.input, function(item, i) {
+                    return _c("div", { staticClass: "input" }, [
+                      _c("div", { staticClass: "field-row" }, [
+                        _c("div", { staticClass: "input" }, [
+                          _c("div", { staticClass: "select fullwidth" }, [
+                            _c(
+                              "select",
+                              {
+                                directives: [
+                                  {
+                                    name: "model",
+                                    rawName: "v-model",
+                                    value: _vm.input[i].handle,
+                                    expression: "input[i].handle"
+                                  }
+                                ],
+                                on: {
+                                  change: [
+                                    function($event) {
                                       var $$selectedVal = Array.prototype.filter
                                         .call($event.target.options, function(
                                           o
@@ -836,39 +856,42 @@ var render = function() {
                                           ? $$selectedVal
                                           : $$selectedVal[0]
                                       )
-                                    }
-                                  }
-                                },
-                                _vm._l(_vm.availableFields, function(field) {
-                                  return _c(
-                                    "option",
-                                    { domProps: { value: field.handle } },
-                                    [_vm._v(_vm._s(field.label))]
-                                  )
-                                }),
-                                0
-                              )
-                            ])
+                                    },
+                                    _vm.updateSearchInput
+                                  ]
+                                }
+                              },
+                              _vm._l(_vm.availableFields, function(field) {
+                                return _c(
+                                  "option",
+                                  { domProps: { value: field.handle } },
+                                  [_vm._v(_vm._s(field.label))]
+                                )
+                              }),
+                              0
+                            )
                           ])
-                        ]),
-                        _vm._v(" "),
-                        _c("div", { staticClass: "fieldrow" }, [
-                          _c("div", { staticClass: "flex" }, [
-                            _c("div", { staticClass: "input" }, [
-                              _c("div", { staticClass: "select" }, [
-                                _c(
-                                  "select",
-                                  {
-                                    directives: [
-                                      {
-                                        name: "model",
-                                        rawName: "v-model",
-                                        value: _vm.input[i].operator,
-                                        expression: "input[i].operator"
-                                      }
-                                    ],
-                                    on: {
-                                      change: function($event) {
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "fieldrow" }, [
+                        _c("div", { staticClass: "flex" }, [
+                          _c("div", { staticClass: "input flex-full" }, [
+                            _c("div", { staticClass: "select" }, [
+                              _c(
+                                "select",
+                                {
+                                  directives: [
+                                    {
+                                      name: "model",
+                                      rawName: "v-model",
+                                      value: _vm.input[i].operator,
+                                      expression: "input[i].operator"
+                                    }
+                                  ],
+                                  on: {
+                                    change: [
+                                      function($event) {
                                         var $$selectedVal = Array.prototype.filter
                                           .call($event.target.options, function(
                                             o
@@ -887,29 +910,37 @@ var render = function() {
                                             ? $$selectedVal
                                             : $$selectedVal[0]
                                         )
-                                      }
-                                    }
-                                  },
-                                  _vm._l(_vm.availableOperators, function(
-                                    operator
-                                  ) {
-                                    return !operator.needsSpecificField ||
-                                      _vm.input[i].handle !== "--any--"
-                                      ? _c(
-                                          "option",
-                                          { domProps: { value: operator.key } },
-                                          [_vm._v(_vm._s(operator.value))]
-                                        )
-                                      : _vm._e()
-                                  }),
-                                  0
-                                )
-                              ])
-                            ]),
-                            _vm._v(" "),
-                            _vm.getOperatorByKey(_vm.input[i].operator)
-                              .showValueField
-                              ? _c("div", { staticClass: "input input-grow" }, [
+                                      },
+                                      _vm.updateSearchInput
+                                    ]
+                                  }
+                                },
+                                _vm._l(_vm.availableOperators, function(
+                                  operator
+                                ) {
+                                  return !operator.needsSpecificField ||
+                                    _vm.input[i].handle !== "--any--"
+                                    ? _c(
+                                        "option",
+                                        { domProps: { value: operator.key } },
+                                        [_vm._v(_vm._s(operator.value))]
+                                      )
+                                    : _vm._e()
+                                }),
+                                0
+                              )
+                            ])
+                          ]),
+                          _vm._v(" "),
+                          _vm.getOperatorByKey(_vm.input[i].operator)
+                            .needsValueField
+                            ? _c(
+                                "div",
+                                {
+                                  staticClass: "input input-important",
+                                  on: { keyup: _vm.updateSearchInput }
+                                },
+                                [
                                   _c("input", {
                                     directives: [
                                       {
@@ -935,18 +966,18 @@ var render = function() {
                                       }
                                     }
                                   })
-                                ])
-                              : _vm._e()
-                          ])
+                                ]
+                              )
+                            : _vm._e()
                         ])
                       ])
-                    })
-                  ],
-                  2
-                )
-              ])
-            ]
-          )
+                    ])
+                  })
+                ],
+                2
+              )
+            ])
+          ])
         ])
       : _vm._e()
   ])

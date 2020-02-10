@@ -1,7 +1,7 @@
 <template>
   <div class="easy-search__container">
     <svg
-      v-on:click="hudIsVisible = !hudIsVisible"
+      v-on:click="toggleHud"
       class="easy-search__button"
       aria-hidden="true"
       focusable="false"
@@ -20,15 +20,15 @@
     <div v-if="hudIsVisible" class="easy-search__hud-shade"></div>
     <div v-if="hudIsVisible" class="easy-search__hud">
       <div class="tip tip-top"></div>
-      <form v-on:change="updateSearchInput" class="body">
+      <form class="body">
         <div class="main-container">
           <div class="main">
-            <h3 class="heading">Build your search query:</h3>
+            <h3 class="heading">{{ getTranslated("Build a search query") }}:</h3>
             <div v-for="item, i in input" class="input">
               <div class="field-row">
                 <div class="input">
                   <div class="select fullwidth">
-                    <select v-model="input[i].handle">
+                    <select v-on:change="updateSearchInput" v-model="input[i].handle">
                       <option
                         v-for="field in availableFields"
                         v-bind:value="field.handle"
@@ -39,9 +39,9 @@
               </div>
               <div class="fieldrow">
                 <div class="flex">
-                  <div class="input">
+                  <div class="input flex-full">
                     <div class="select">
-                      <select v-model="input[i].operator">
+                      <select v-on:change="updateSearchInput" v-model="input[i].operator">
                         <option
                           v-if="!operator.needsSpecificField || input[i].handle !== '--any--'"
                           v-for="operator in availableOperators"
@@ -50,7 +50,7 @@
                       </select>
                     </div>
                   </div>
-                  <div v-if="getOperatorByKey(input[i].operator).showValueField" class="input input-grow">
+                  <div v-on:keyup="updateSearchInput" v-if="getOperatorByKey(input[i].operator).needsValueField" class="input input-important">
                     <input type="text" v-model="item.value" class="text nicetext fullwidth" />
                   </div>
                 </div>
@@ -67,11 +67,13 @@
 export default {
   data() {
     return {
+      elementType: null,
       hudIsVisible: false,
+      currentSearchQuery: '',
       availableFields: [
         {
           handle: "--any--",
-          label: "Any field"
+          label: this.getTranslated("Any field")
         },
         {
           handle: "title",
@@ -85,48 +87,48 @@ export default {
       availableOperators: [
         {
           key: "contains",
-          value: "contains",
+          value: this.getTranslated('contains'),
           fieldSearch: "{fieldHandle}:{value}",
           globalSearch: "{value}",
-          showValueField: true,
+          needsValueField: true,
           needsSpecificField: false
         },
         {
           key: "notContains",
-          value: "does not contain",
+          value: this.getTranslated('does not contain'),
           fieldSearch: "-{fieldHandle}:{value}",
           globalSearch: "-{value}",
-          showValueField: true,
+          needsValueField: true,
           needsSpecificField: false
         },
         {
           key: "equal",
-          value: "is equal to",
+          value: this.getTranslated('is equal to'),
           fieldSearch: "{fieldHandle}::{value}",
           globalSearch: '"{value}"',
-          showValueField: true,
+          needsValueField: true,
           needsSpecificField: false
         },
         {
           key: "notEqual",
-          value: "is not equal to",
+          value: this.getTranslated('is not equal to'),
           fieldSearch: "-{fieldHandle}::{value}",
           globalSearch: '-"{value}"',
-          showValueField: true,
+          needsValueField: true,
           needsSpecificField: false
         },
         {
           key: "empty",
-          value: "is empty",
+          value: this.getTranslated('is empty'),
           fieldSearch: "-{fieldHandle}:*",
-          showValueField: false,
+          needsValueField: false,
           needsSpecificField: true
         },
         {
           key: "notempty",
-          value: "is not empty",
+          value: this.getTranslated('is not empty'),
           fieldSearch: "{fieldHandle}:*",
-          showValueField: false,
+          needsValueField: false,
           needsSpecificField: true
         }
       ],
@@ -139,34 +141,44 @@ export default {
       ]
     };
   },
-  mounted: function() {},
+  mounted: function() {
+    this.populateAvailableFields();
+  },
   methods: {
+    toggleHud() {
+      this.hudIsVisible = !this.hudIsVisible;
+    },
     updateSearchInput() {
       var searchQuery = this.buildSearchQuery();
 
-      window.searchInput.value = searchQuery;
-      Craft.elementIndex.searchText = searchQuery;
-      Craft.elementIndex.updateElements();
+      if (searchQuery != this.currentSearchQuery) {
+        window.searchInput.value = searchQuery;
+        Craft.elementIndex.searchText = searchQuery;
+        Craft.elementIndex.updateElements();
+        this.currentSearchQuery = searchQuery;
+      }
     },
     buildSearchQuery() {
       var searchQuery = "";
       for (let i = 0; i < this.input.length; i++) {
         var row = this.input[i];
-
-        if (i !== 0) {
-          searchQuery += " ";
-        }
-
         var operator = this.getOperatorByKey(row.operator);
-        var searchString =
-          row.handle == "--any--"
-            ? operator.globalSearch
-            : operator.fieldSearch;
 
-        searchString = searchString.replace("{value}", row.value);
-        searchString = searchString.replace("{fieldHandle}", row.handle);
+        if (!operator.needsValueField || row.value !== '') {
+          if (searchQuery === "") {
+            searchQuery += " ";
+          }
 
-        searchQuery += searchString;
+          var searchString =
+            row.handle == "--any--"
+              ? operator.globalSearch
+              : operator.fieldSearch;
+
+          searchString = searchString.replace("{value}", row.value);
+          searchString = searchString.replace("{fieldHandle}", row.handle);
+
+          searchQuery += searchString;
+        }
       }
 
       return searchQuery;
@@ -181,7 +193,18 @@ export default {
       }
 
       return null;
-    }
+    },
+    getTranslated(string) {
+      return Craft.t('easy-search', string);
+    },
+    populateAvailableFields() {
+      // First, get the element type
+      this.elementType = Craft.elementIndex !== undefined && Craft.elementIndex.elementType !== undefined ? Craft.elementIndex.elementType : null;
+
+      if (this.elementType) {
+        console.log(this.elementType);
+      }
+    },
   }
 };
 </script>

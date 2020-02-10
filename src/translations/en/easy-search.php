@@ -14,5 +14,6 @@
  * @since     1.0.0
  */
 return [
-    'Easy Search plugin loaded' => 'Easy Search plugin loaded',
+    'Build a search query' => 'Build a search query',
+    'Any field' => 'Any field',
 ];

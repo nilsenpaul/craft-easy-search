@@ -21,6 +21,7 @@ use craft\web\UrlManager;
 use craft\events\RegisterUrlRulesEvent;
 
 use yii\base\Event;
+use craft\helpers\UrlHelper;
 
 /**
  * Class EasySearch
@@ -72,9 +73,21 @@ class EasySearch extends Plugin
             ),
             __METHOD__
         );
+
+        $this->registerTranslations();
     }
 
-    // Protected Methods
-    // =========================================================================
-
+    protected function registerTranslations()
+    {
+        Craft::$app->getView()->registerTranslations('easy-search', [
+            'Build a search query',
+            'Any field',
+            'contains',
+            'does not contain',
+            'is equal to',
+            'is not equal to',
+            'is empty',
+            'is not empty',
+        ]);
+    }
 }
