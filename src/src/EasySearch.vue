@@ -142,7 +142,9 @@ export default {
     };
   },
   mounted: function() {
-    this.populateAvailableFields();
+    this.$nextTick(function() {
+      this.populateAvailableFields();
+    });
   },
   methods: {
     toggleHud() {
@@ -201,6 +203,7 @@ export default {
       // First, get the element type
       this.elementType = Craft.elementIndex !== undefined && Craft.elementIndex.elementType !== undefined ? Craft.elementIndex.elementType : null;
 
+console.log(Craft.elementIndex);
       if (this.elementType) {
         console.log(this.elementType);
       }

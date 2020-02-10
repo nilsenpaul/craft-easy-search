@@ -225,7 +225,9 @@ __webpack_require__.r(__webpack_exports__);
     };
   },
   mounted: function mounted() {
-    this.populateAvailableFields();
+    this.$nextTick(function () {
+      this.populateAvailableFields();
+    });
   },
   methods: {
     toggleHud: function toggleHud() {
@@ -279,6 +281,7 @@ __webpack_require__.r(__webpack_exports__);
     populateAvailableFields: function populateAvailableFields() {
       // First, get the element type
       this.elementType = Craft.elementIndex !== undefined && Craft.elementIndex.elementType !== undefined ? Craft.elementIndex.elementType : null;
+      console.log(Craft.elementIndex);
 
       if (this.elementType) {
         console.log(this.elementType);
@@ -13195,21 +13198,24 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vue__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _EasySearch_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./EasySearch.vue */ "./src/EasySearch.vue");
 
- // Can we find the search input?
 
-window.searchInput = document.querySelector('header .search input');
 
-if (window.searchInput !== null) {
-  // Create a new container for easy search
-  var easySearchContainer = document.createElement('div'); // Add the search container to the search input
+window.onload = function () {
+  // Can we find the search input?
+  window.searchInput = document.querySelector('header .search input');
 
-  window.searchInput.after(easySearchContainer);
-  new vue__WEBPACK_IMPORTED_MODULE_0___default.a({
-    render: function render(h) {
-      return h(_EasySearch_vue__WEBPACK_IMPORTED_MODULE_1__["default"]);
-    }
-  }).$mount(easySearchContainer);
-}
+  if (window.searchInput !== null) {
+    // Create a new container for easy search
+    var easySearchContainer = document.createElement('div'); // Add the search container to the search input
+
+    window.searchInput.after(easySearchContainer);
+    new vue__WEBPACK_IMPORTED_MODULE_0___default.a({
+      render: function render(h) {
+        return h(_EasySearch_vue__WEBPACK_IMPORTED_MODULE_1__["default"]);
+      }
+    }).$mount(easySearchContainer);
+  }
+};
 
 /***/ }),
 
