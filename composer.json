@@ -13,10 +13,10 @@
         "query"
     ],
     "support": {
-        "docs": "https://github.com/nilsenpaul/craft-easy-search/easy-search/blob/master/README.md",
-        "issues": "https://github.com/nilsenpaul/craft-easy-search/easy-search/issues"
+        "docs": "https://github.com/nilsenpaul/craft-easy-search/blob/master/README.md",
+        "issues": "https://github.com/nilsenpaul/craft-easy-search/issues"
     },
-    "license": "MIT",
+    "license": "Craft",
     "authors": [
         {
             "name": "nils&paul",
@@ -24,7 +24,7 @@
         }
     ],
     "require": {
-        "craftcms/cms": "^3.0.0-RC1"
+        "craftcms/cms": "^3.0.0"
     },
     "autoload": {
         "psr-4": {
@@ -36,7 +36,7 @@
         "handle": "easy-search",
         "hasCpSettings": false,
         "hasCpSection": false,
-        "changelogUrl": "https://raw.githubusercontent.com/nilsenpaul/craft-easy-search/easy-search/master/CHANGELOG.md",
+        "changelogUrl": "https://raw.githubusercontent.com/nilsenpaul/craft-easy-search/master/CHANGELOG.md",
         "components": {
             "easySearchService": "nilsenpaul\\easysearch\\services\\EasySearchService"
         },
