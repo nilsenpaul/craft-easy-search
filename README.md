@@ -1,8 +1,6 @@
+![Logo](src/icon.svg | width=100)
+
 # Easy Search plugin for Craft CMS 3.x
-
-tbd
-
-![Logo](src/icon.svg)
 
 ## Requirements
 
