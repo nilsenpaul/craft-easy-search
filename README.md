@@ -1,10 +1,12 @@
-![Logo](src/icon.svg | width=100)
-
 # Easy Search plugin for Craft CMS 3.x
+
+Easy Search lets content editors use predefined search queries in Craft's control panel, or 'build' their own.
+
+
 
 ## Requirements
 
-This plugin requires Craft CMS 3.0.0-beta.23 or later.
+This plugin requires Craft CMS 3.0.0 or later.
 
 ## Installation
 
@@ -16,26 +18,34 @@ To install the plugin, follow these instructions.
 
 2. Then tell Composer to load the plugin:
 
-        composer require nilsenpaul/craft-easy-search/easy-search
+        composer require nilsenpaul/craft-easy-search
 
 3. In the Control Panel, go to Settings → Plugins and click the “Install” button for Easy Search.
 
-## Easy Search Overview
+## Configuring Easy Search (optional)
 
--Insert text here-
+If you want to be able to use predefined search queries with Easy Search, create a file in Craft's `config` folder, named `easy-search.php`. In this file, you'd add the following:
 
-## Configuring Easy Search
+```
+<?php
 
--Insert text here-
-
-## Using Easy Search
-
--Insert text here-
-
-## Easy Search Roadmap
-
-Some things to do, and ideas for potential features:
-
-* Release it
+return [
+  'queries' => [
+    [
+      'query' => 'title:*',
+      'label' => 'All items with a title',
+      'element' => 'craft\\elements\\Entry', // This is optional, and will make Easy Search only show this query on the Entries element index
+    ],
+    [
+      'query' => 'image:*',
+      'label' => 'All items with an image',
+    ],
+    [
+      'query' => '-image:*',
+      'label' => 'All items without an image',
+    ],
+  ]
+];
+```
 
 Brought to you by [nils&paul](https://nilsenpaul.nl)
