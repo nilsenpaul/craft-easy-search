@@ -163,15 +163,11 @@ class EasySearchService extends Component
 
     protected function getFieldsForElement($element, &$fieldsToReturn)
     {
-        $fieldTypesToExclude = [
-            'lightswitch',
-        ];
-
         if ($element::hasContent() && ($fieldLayout = $element->getFieldLayout()) !== null) {
             foreach ($fieldLayout->getFields() as $field) {
                 $fieldType = strtolower(str_replace('craft\\fields\\', '', $field::className()));
 
-                if ($field->searchable && !in_array($fieldType, $fieldTypesToExclude)) {
+                if ($field->searchable) {
                     $fieldsToReturn[] = [
                         'handle' => $field->handle,
                         'label' => $field->name,
