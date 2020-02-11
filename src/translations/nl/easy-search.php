@@ -17,4 +17,5 @@ return [
     'Use a predefined query' => 'Gebruik opgeslagen zoekopdrachten',
     'Select a search query' => 'Selecteer een zoekopdracht',
     '... or build one' => '... of maak er één',
+    'remove' => 'verwijder',
 ];

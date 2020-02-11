@@ -57,6 +57,7 @@ class EasySearch extends Plugin
             'Use a predefined query',
             '... or build one',
             'Select a search query',
+            'remove',
         ]);
     }
 }

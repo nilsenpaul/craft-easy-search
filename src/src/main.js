@@ -3,7 +3,7 @@ import EasySearch from './EasySearch.vue';
 
 window.onload = function () {
     // Can we find the search input?
-    window.searchInput = document.querySelector('header .search input');
+    window.searchInput = document.querySelector('.search input');
 
     if (window.searchInput !== null) {
         // Create a new container for easy search

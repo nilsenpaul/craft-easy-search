@@ -159,6 +159,10 @@ body.ltr #header .easy-search__container .flex:not(:last-child) {
     margin-right: 0;
 }
 
+body.ltr .easy-search__container .flex > :not(:last-child) {
+    margin-right: 0;
+}
+
 body.ltr .texticon .clear {
     right: 32px;
 }
