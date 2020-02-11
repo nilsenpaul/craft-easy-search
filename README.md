@@ -2,7 +2,7 @@
 
 Easy Search lets content editors use predefined search queries in Craft's control panel, or 'build' their own.
 
-
+![Easy Search](resources/gif/easy-search.gif)
 
 ## Requirements
 
