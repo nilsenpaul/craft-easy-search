@@ -116,12 +116,46 @@ $npRed: #ff4136;
 
         .and-or-or {
             margin: 0 0 12px 0;
+            text-align: left;
+        }
+
+        .remove-condition {
+            float: right;
+            line-height: 26px;
+            font-size: 0.8rem;
+            color: $npRed;
+            appearance: none;
+            border: 0;
+            background-color: transparent;
+            padding: 0;
+            cursor: pointer;
+
+            &:hover {
+                text-decoration: underline;
+            }
         }
         
+        &-queries {
+            margin: 0 0 24px;
+        }
+
+        &-conditions {
+            position: relative;
+        }
+
+        &-hider {
+            background-color: rgba(255, 255, 255, 0.5);
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 100;
+        }
     }
 }
 
-body.ltr #header .flex:not(:last-child) {
+body.ltr #header .easy-search__container .flex:not(:last-child) {
     margin-right: 0;
 }
 

@@ -1,18 +1,5 @@
 <?php
-/**
- * Easy Search plugin for Craft CMS 3.x
- *
- * tbd
- *
- * @link      https://nilsenpaul.nl
- * @copyright Copyright (c) 2020 nils&paul
- */
 
-/**
- * @author    nils&paul
- * @package   EasySearch
- * @since     1.0.0
- */
 return [
     'Build a search query' => 'Maak een zoekopdracht',
     'Any field' => 'Alle velden',
@@ -27,4 +14,7 @@ return [
     'or' => 'of',
     'Extension' => 'Extensie',
     'Kind' => 'Bestandstype',
+    'Use a predefined query' => 'Gebruik opgeslagen zoekopdrachten',
+    'Select a search query' => 'Selecteer een zoekopdracht',
+    '... or build one' => '... of maak er één',
 ];

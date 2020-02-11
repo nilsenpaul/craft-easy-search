@@ -1,80 +1,43 @@
 <?php
-/**
- * Easy Search plugin for Craft CMS 3.x
- *
- * tbd
- *
- * @link      https://nilsenpaul.nl
- * @copyright Copyright (c) 2020 nils&paul
- */
 
 namespace nilsenpaul\easysearch;
 
-use nilsenpaul\easysearch\services\EasySearchService as EasySearchServiceService;
 use nilsenpaul\easysearch\assetbundles\EasySearchBundle;
 
 use Craft;
 use craft\base\Plugin;
-use craft\services\Plugins;
-use craft\events\PluginEvent;
-use craft\web\UrlManager;
-use craft\events\RegisterUrlRulesEvent;
+use craft\helpers\Json;
 
-use yii\base\Event;
-use craft\helpers\UrlHelper;
+use yii\web\View;
 
-/**
- * Class EasySearch
- *
- * @author    nils&paul
- * @package   EasySearch
- * @since     1.0.0
- *
- * @property  EasySearchServiceService $easySearchService
- */
 class EasySearch extends Plugin
 {
-    // Static Properties
-    // =========================================================================
-
-    /**
-     * @var EasySearch
-     */
-    public static $plugin;
-
-    // Public Properties
-    // =========================================================================
-
-    /**
-     * @var string
-     */
+    public static $instance;
     public $schemaVersion = '1.0.0';
 
-    // Public Methods
-    // =========================================================================
-
-    /**
-     * @inheritdoc
-     */
     public function init()
     {
         parent::init();
-        self::$plugin = $this;
+        self::$instance = $this;
 
         if (Craft::$app->getRequest()->isCpRequest) {
             Craft::$app->getView()->registerAssetBundle(EasySearchBundle::class);
+
+            $this->registerPredefinedQueries();
+            $this->registerTranslations();
         }
+    }
 
-        Craft::info(
-            Craft::t(
-                'easy-search',
-                '{name} plugin loaded',
-                ['name' => $this->name]
-            ),
-            __METHOD__
-        );
+    protected function createSettingsModel()
+    {
+        return new \nilsenpaul\easysearch\models\Settings();
+    }
 
-        $this->registerTranslations();
+    protected function registerPredefinedQueries()
+    {
+        Craft::$app->getView()->registerJs("
+            window.predefinedQueries = " . Json::encode($this->getSettings()->queries) . ";
+        ", View::POS_HEAD);
     }
 
     protected function registerTranslations()
@@ -91,6 +54,9 @@ class EasySearch extends Plugin
             'Add a condition',
             'and',
             'or',
+            'Use a predefined query',
+            '... or build one',
+            'Select a search query',
         ]);
     }
 }

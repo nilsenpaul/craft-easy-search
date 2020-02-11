@@ -5,7 +5,6 @@
       class="easy-search__button"
       aria-hidden="true"
       focusable="false"
-      data-prefix="fas"
       data-icon="sparkles"
       role="img"
       xmlns="http://www.w3.org/2000/svg"
@@ -22,50 +21,80 @@
       <form class="body">
         <div class="main-container">
           <div class="main">
-            <h3 class="heading">{{ getTranslated("Build a search query") }}:</h3>
-            <div v-for="item, i in conditions" class="condition">
-              <div v-if="i > 0" class="and-or-or">
-                <div class="input">
-                  <div class="select small">
-                    <select v-on:change="updateSearchInput" v-model="item.andOrOr">
-                      <option value=" ">{{ getTranslated('and') }}</option>
-                      <option value=" OR ">{{ getTranslated('or') }}</option>
-                    </select>
-                  </div>
+            <div v-if="predefinedQueries.length > 0" class="easy-search__hud-queries">
+              <h3 class="heading">{{ getTranslated("Use a predefined query") }}:</h3>
+              <div class="input">
+                <div class="select fullwidth">
+                  <select v-on:change="updateSearchInput" v-model="selectedQuery">
+                    <option value>{{ getTranslated('Select a search query') }}</option>
+                    <option
+                      v-for="item in predefinedQueries"
+                      v-bind:value="item.query"
+                    >{{ item.label }}</option>
+                  </select>
                 </div>
               </div>
-              <div class="field-row">
-                <div class="input">
-                  <div class="select fullwidth">
-                    <select v-on:change="updateSearchInput" v-model="item.handle">
-                      <option
-                        v-for="field in availableFields"
-                        v-bind:value="field.handle"
-                      >{{ field.label }}</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-              <div class="fieldrow">
-                <div class="flex">
-                  <div class="input flex-full">
-                    <div class="select fullwidth">
-                      <select v-on:change="updateSearchInput" v-model="item.operator">
-                        <option
-                          v-if="!operator.needsSpecificField || item.handle !== '--any--'"
-                          v-for="operator in availableOperators"
-                          v-bind:value="operator.key"
-                        >{{ operator.value }}</option>
+            </div>
+
+            <div class="easy-search__hud-conditions">
+              <div v-if="selectedQuery !== ''" class="easy-search__hud-hider"></div>
+              <h3
+                class="heading"
+              >{{ predefinedQueries.length > 0 ? getTranslated("... or build one") : getTranslated("Build a search query") }}:</h3>
+              <div v-for="item, i in conditions" class="condition" v-bind:index="i">
+                <div v-if="i > 0" class="and-or-or">
+                  <button
+                    v-on:click.prevent="removeCondition(i)"
+                    class="remove-condition"
+                  >{{ getTranslated('remove') }}</button>
+                  <div class="input">
+                    <div class="select small">
+                      <select v-on:change="updateSearchInput" v-model="item.andOrOr">
+                        <option value=" ">{{ getTranslated('and') }}</option>
+                        <option value=" OR ">{{ getTranslated('or') }}</option>
                       </select>
                     </div>
                   </div>
-                  <div v-on:keyup="updateSearchInput" v-if="getOperatorByKey(item.operator).needsValueField" class="input input-important">
-                    <input type="text" v-model="item.value" class="text nicetext fullwidth" />
+                </div>
+                <div class="field-row">
+                  <div class="input">
+                    <div class="select fullwidth">
+                      <select v-on:change="updateSearchInput" v-model="item.handle">
+                        <option
+                          v-for="field in availableFields"
+                          v-bind:value="field.handle"
+                        >{{ field.label }}</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
-                <button v-if="conditionIsComplete(conditions.slice(-1)[0]) && i == conditions.length - 1" v-on:click="addConditionRow" class="add-btn">
-                  &plus; {{ getTranslated('Add a condition') }}
-                </button>
+                <div class="fieldrow">
+                  <div class="flex">
+                    <div class="input flex-full">
+                      <div class="select fullwidth">
+                        <select v-on:change="updateSearchInput" v-model="item.operator">
+                          <option
+                            v-if="!operator.needsSpecificField || item.handle !== '--any--'"
+                            v-for="operator in availableOperators"
+                            v-bind:value="operator.key"
+                          >{{ operator.value }}</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div
+                      v-on:keyup="updateSearchInput"
+                      v-if="getOperatorByKey(item.operator).needsValueField"
+                      class="input input-important"
+                    >
+                      <input type="text" v-model="item.value" class="text nicetext fullwidth" />
+                    </div>
+                  </div>
+                  <button
+                    v-if="conditionIsComplete(conditions.slice(-1)[0]) && i == conditions.length - 1"
+                    v-on:click="addConditionRow"
+                    class="add-btn"
+                  >&plus; {{ getTranslated('Add a condition') }}</button>
+                </div>
               </div>
             </div>
           </div>
@@ -76,13 +105,11 @@
 </template>
 
 <script>
-const defaultConditions = [
-  {
-    handle: "--any--",
-    operator: "contains",
-    value: ""
-  }
-];
+const defaultConditions = {
+  handle: "--any--",
+  operator: "contains",
+  value: ""
+};
 
 export default {
   data() {
@@ -90,12 +117,19 @@ export default {
       currentElementType: null,
       currentSource: null,
       hudIsVisible: false,
-      currentSearchQuery: '',
-      availableFields: [],
+      currentSearchQuery: "",
+      predefinedQueries: [],
+      selectedQuery: "",
+      availableFields: [
+        {
+          handle: "--any--",
+          label: this.getTranslated("Any field")
+        }
+      ],
       availableOperators: [
         {
           key: "contains",
-          value: this.getTranslated('contains'),
+          value: this.getTranslated("contains"),
           fieldSearch: "{fieldHandle}:{value}",
           globalSearch: "{value}",
           needsValueField: true,
@@ -103,7 +137,7 @@ export default {
         },
         {
           key: "notContains",
-          value: this.getTranslated('does not contain'),
+          value: this.getTranslated("does not contain"),
           fieldSearch: "-{fieldHandle}:{value}",
           globalSearch: "-{value}",
           needsValueField: true,
@@ -111,7 +145,7 @@ export default {
         },
         {
           key: "equal",
-          value: this.getTranslated('is equal to'),
+          value: this.getTranslated("is equal to"),
           fieldSearch: "{fieldHandle}::{value}",
           globalSearch: '"{value}"',
           needsValueField: true,
@@ -119,7 +153,7 @@ export default {
         },
         {
           key: "notEqual",
-          value: this.getTranslated('is not equal to'),
+          value: this.getTranslated("is not equal to"),
           fieldSearch: "-{fieldHandle}::{value}",
           globalSearch: '-"{value}"',
           needsValueField: true,
@@ -127,35 +161,59 @@ export default {
         },
         {
           key: "empty",
-          value: this.getTranslated('is empty'),
+          value: this.getTranslated("is empty"),
           fieldSearch: "-{fieldHandle}:*",
           needsValueField: false,
           needsSpecificField: true
         },
         {
           key: "notempty",
-          value: this.getTranslated('is not empty'),
+          value: this.getTranslated("is not empty"),
           fieldSearch: "{fieldHandle}:*",
           needsValueField: false,
           needsSpecificField: true
         }
       ],
-      conditions: null,
+      conditions: []
     };
   },
   mounted: function() {
     var that = this;
-    document.querySelector('body').addEventListener('click', function (event) {
-      if (!event.target.closest('.easy-search__container') && !event.target.matches('.add-btn')) {
+    document.querySelector("body").addEventListener("click", function(event) {
+      if (
+        !event.target.closest(".easy-search__container") &&
+        !event.target.matches(".add-btn") &&
+        !event.target.matches(".remove-condition") &&
+        !event.target.matches(".clear")
+      ) {
         that.toggleHud(false);
       }
     });
+
+    document
+      .querySelector(".search .clear")
+      .addEventListener("click", function(event) {
+        that.resetSearch();
+        that.toggleHud(false);
+      });
+
+    // Pre-populate fields
+    this.populateAvailableFields();
+
+    // Set predefined queries
+    for (let i = 0; i < window.predefinedQueries.length; i++) {
+      var queryItem = window.predefinedQueries[i];
+
+      if (queryItem.element === undefined || queryItem.element === this.currentElementType) {
+        this.predefinedQueries.push(queryItem);
+      }
+    }
   },
   methods: {
     toggleHud(display = null) {
       // Set default conditions if none are set
-      if (this.conditions === null) {
-        this.conditions = defaultConditions;
+      if (this.conditions.length === 0) {
+        this.$set(this.conditions, 0, defaultConditions);
       }
 
       // Set HUD visibility
@@ -164,10 +222,17 @@ export default {
 
       if (display) {
         this.populateAvailableFields();
+        this.updateSearchInput();
       }
+    },
+    resetSearch() {
+      this.selectedQuery = "";
+      this.conditions.splice(1, 1);
+      this.conditions[0].handle = "--any--";
+      this.conditions[0].operator = "contains";
+      this.conditions[0].value = "";
 
-      // Update search input to disabled/enable input field on HUD toggle
-      this.updateSearchInput();
+      Craft.elementIndex.stopSearching();
     },
     updateSearchInput() {
       var searchQuery = this.buildSearchQuery();
@@ -175,39 +240,42 @@ export default {
       if (searchQuery != this.currentSearchQuery) {
         window.searchInput.value = searchQuery;
         Craft.elementIndex.searchText = searchQuery;
+        Craft.elementIndex.startSearching();
         Craft.elementIndex.updateElements();
         this.currentSearchQuery = searchQuery;
-      }
-
-      if (searchQuery !== '' && this.hudIsVisible) {
-        window.searchInput.disabled = true;
-      } else {
-        window.searchInput.disabled = false;
       }
     },
     buildSearchQuery() {
       var searchQuery = "";
-      for (let i = 0; i < this.conditions.length; i++) {
-        var condition = this.conditions[i];
-        var operator = this.getOperatorByKey(condition.operator);
+      if (this.selectedQuery != "") {
+        searchQuery = this.selectedQuery;
+      } else {
+        for (let i = 0; i < this.conditions.length; i++) {
+          var condition = this.conditions[i];
+          var operator = this.getOperatorByKey(condition.operator);
 
-        if (this.conditionIsComplete(condition)) {
-          if (searchQuery === "") {
-            searchQuery += " ";
-          } else {
-            var andOrOr = condition.andOrOr !== undefined ? condition.andOrOr : '';
-            searchQuery += andOrOr;
+          if (this.conditionIsComplete(condition)) {
+            if (searchQuery === "") {
+              searchQuery += " ";
+            } else {
+              var andOrOr =
+                condition.andOrOr !== undefined ? condition.andOrOr : "";
+              searchQuery += andOrOr;
+            }
+
+            var searchString =
+              condition.handle == "--any--"
+                ? operator.globalSearch
+                : operator.fieldSearch;
+
+            searchString = searchString.replace("{value}", condition.value);
+            searchString = searchString.replace(
+              "{fieldHandle}",
+              condition.handle
+            );
+
+            searchQuery += searchString;
           }
-
-          var searchString =
-            condition.handle == "--any--"
-              ? operator.globalSearch
-              : operator.fieldSearch;
-
-          searchString = searchString.replace("{value}", condition.value);
-          searchString = searchString.replace("{fieldHandle}", condition.handle);
-
-          searchQuery += searchString;
         }
       }
 
@@ -225,32 +293,40 @@ export default {
       return null;
     },
     getTranslated(string) {
-      return Craft.t('easy-search', string);
+      return Craft.t("easy-search", string);
     },
     addConditionRow() {
       this.conditions.push({
-          andOrOr: ' ',
-          handle: "--any--",
-          operator: "contains",
-          value: ""
-        });
+        andOrOr: " ",
+        handle: "--any--",
+        operator: "contains",
+        value: ""
+      });
     },
     conditionIsComplete(condition) {
       var operator = this.getOperatorByKey(condition.operator);
 
-      return !operator.needsValueField || condition.value !== '';
+      return !operator.needsValueField || condition.value !== "";
     },
     populateAvailableFields() {
       // First, get the element type and source
-      var elementType = Craft.elementIndex !== undefined && Craft.elementIndex.elementType !== undefined ? Craft.elementIndex.elementType : null;
+      var elementType =
+        Craft.elementIndex !== undefined &&
+        Craft.elementIndex.elementType !== undefined
+          ? Craft.elementIndex.elementType
+          : null;
       var source = Craft.elementIndex.instanceState.selectedSource;
 
-      if (elementType != this.currentElementType || source != this.currentSource) {       
-        fetch('/actions/easy-search/default/get-available-fields?elementType=' + elementType + '&source=' + source)
-          .then((response) => {
+      // Then, get all fields for the elementType and source
+      if (
+        elementType != this.currentElementType ||
+        source != this.currentSource
+      ) {
+        fetch("/actions/easy-search/fields/get-available-fields?elementType=" + elementType + "&source=" + source)
+          .then(response => {
             return response.json();
           })
-          .then((jsonResponse) => {
+          .then(jsonResponse => {
             this.availableFields = jsonResponse;
           });
       }
@@ -258,6 +334,9 @@ export default {
       this.currentElementType = elementType;
       this.currentSource = source;
     },
+    removeCondition(index) {
+      this.conditions.splice(index, 1);
+    }
   }
 };
 </script>
