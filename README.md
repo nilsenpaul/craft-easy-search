@@ -2,7 +2,7 @@
 
 tbd
 
-![Screenshot](resources/img/plugin-logo.png)
+![Logo](src/icon.svg)
 
 ## Requirements
 
