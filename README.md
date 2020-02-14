@@ -1,6 +1,6 @@
 # Easy Search plugin for Craft CMS 3.x
 
-Easy Search lets content editors use predefined search queries in Craft's control panel, or 'build' their own.
+Craft's search functionality, powerful as it may be, is not as end user friendly as you'd like it to be. With Easy Search, your content editors can use predefined search queries ("search for all entries with an image field that's not empty") or build their own search query with a user friendly GUI.
 
 ![Easy Search](resources/gif/easy-search.gif)
 
