@@ -29,6 +29,9 @@ class EasySearchService extends Component
                 case 'craft\\commerce\\elements\\Product':
                     $fieldsToReturn = $this->getProductFields($element, $source);
                     break;
+                case 'craft\\commerce\\elements\\Order':
+                    $fieldsToReturn = $this->getOrderFields($element);
+                    break;
             }
 
             return array_merge([
@@ -210,6 +213,64 @@ class EasySearchService extends Component
             [
                 'handle' => 'slug',
                 'label' => Craft::t('app', 'Slug'),
+            ],
+        ], $fieldsToReturn);
+    }
+
+    protected function getOrderFields($element)
+    {
+        $productTypeIds = [];
+        $fieldsToReturn = [];
+
+        $commerce = Craft::$app->getPlugins()->getPlugin('commerce');
+
+        // Get all searchable fields for the sections and entry types we found
+        $this->getFieldsForElement($element, $fieldsToReturn);
+
+        return array_merge([
+            [
+                'handle' => 'billingFirstName',
+                'label' => Craft::t('app', 'Billing: first name'),
+            ],
+            [
+                'handle' => 'billingLastName',
+                'label' => Craft::t('app', 'Billing: last name'),
+            ],
+            [
+                'handle' => 'billingFullName',
+                'label' => Craft::t('app', 'Billing: full name'),
+            ],
+            [
+                'handle' => 'billingPhone',
+                'label' => Craft::t('app', 'Billing: phone'),
+            ],
+            [
+                'handle' => 'shippingFirstName',
+                'label' => Craft::t('app', 'Shipping: first name'),
+            ],
+            [
+                'handle' => 'shippingLastName',
+                'label' => Craft::t('app', 'Shipping: last name'),
+            ],
+            [
+                'handle' => 'shippingFullName',
+                'label' => Craft::t('app', 'Shipping: full name'),
+            ],
+            [
+                'handle' => 'shippingPhone',
+                'label' => Craft::t('app', 'Shipping: phone'),
+            ],
+            [
+                'handle' => 'transactionReference',
+                'label' => Craft::t('app', 'Transaction reference'),
+            ],
+            [
+                'handle' => 'username',
+                'label' => Craft::t('app', 'Username'),
+            ],
+            [
+                'handle' => 'skus',
+                'label' => Craft::t('app', 'SKUs'),
             ],
         ], $fieldsToReturn);
     }
