@@ -51,6 +51,8 @@ class EasySearch extends Plugin
             'is not equal to',
             'is empty',
             'is not empty',
+            'is true',
+            'is false',
             'Add a condition',
             'and',
             'or',
@@ -58,6 +60,9 @@ class EasySearch extends Plugin
             '... or build one',
             'Select a search query',
             'remove',
+            'Show results',
+            'Remove this condition',
+            'Show the results for this query',
         ]);
     }
 }

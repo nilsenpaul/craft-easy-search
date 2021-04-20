@@ -79,10 +79,12 @@ class EasySearchService extends Component
             [
                 'handle' => 'title',
                 'label' => Craft::t('app', 'Title'),
+                'isBoolean' => false,
             ],
             [
                 'handle' => 'slug',
                 'label' => Craft::t('app', 'Slug'),
+                'isBoolean' => false,
             ],
         ], $fieldsToReturn);
     }
@@ -96,22 +98,27 @@ class EasySearchService extends Component
             [
                 'handle' => 'username',
                 'label' => Craft::t('app', 'Username'),
+                'isBoolean' => false,
             ],
             [
                 'handle' => 'firstName',
                 'label' => Craft::t('app', 'First Name'),
+                'isBoolean' => false,
             ],
             [
                 'handle' => 'lastName',
                 'label' => Craft::t('app', 'Last Name'),
+                'isBoolean' => false,
             ],
             [
                 'handle' => 'fullName',
                 'label' => Craft::t('app', 'Full Name'),
+                'isBoolean' => false,
             ],
             [
                 'handle' => 'email',
                 'label' => Craft::t('app', 'Email'),
+                'isBoolean' => false,
             ],
         ], $fieldsToReturn);
     }
@@ -128,10 +135,12 @@ class EasySearchService extends Component
             [
                 'handle' => 'title',
                 'label' => Craft::t('app', 'Title'),
+                'isBoolean' => false,
             ],
             [
                 'handle' => 'slug',
                 'label' => Craft::t('app', 'Slug'),
+                'isBoolean' => false,
             ],
         ], $fieldsToReturn);
     }
@@ -148,18 +157,22 @@ class EasySearchService extends Component
             [
                 'handle' => 'title',
                 'label' => Craft::t('app', 'Title'),
+                'isBoolean' => false,
             ],
             [
                 'handle' => 'filename',
                 'label' => Craft::t('app', 'Filename'),
+                'isBoolean' => false,
             ],
             [
                 'handle' => 'extension',
                 'label' => Craft::t('easy-search', 'Extension'),
+                'isBoolean' => false,
             ],
             [
                 'handle' => 'kind',
                 'label' => Craft::t('easy-search', 'Kind'),
+                'isBoolean' => false,
             ],
         ], $fieldsToReturn);
     }
@@ -170,11 +183,14 @@ class EasySearchService extends Component
             foreach ($fieldLayout->getFields() as $field) {
                 $fieldType = strtolower(str_replace('craft\\fields\\', '', $field::className()));
 
-                if ($field->searchable) {
+                if ($field->searchable && !$this->valueInArray($field->handle, 'handle', $fieldsToReturn)) {
                     $fieldsToReturn[] = [
                         'handle' => $field->handle,
                         'label' => $field->name,
+                        'isBoolean' => $fieldType == 'lightswitch',
                     ];
+
+                    $returnedHandles[] = $field->handle;
                 }
             }
         }
@@ -209,20 +225,19 @@ class EasySearchService extends Component
             [
                 'handle' => 'title',
                 'label' => Craft::t('app', 'Title'),
+                'isBoolean' => false,
             ],
             [
                 'handle' => 'slug',
                 'label' => Craft::t('app', 'Slug'),
+                'isBoolean' => false,
             ],
         ], $fieldsToReturn);
     }
 
     protected function getOrderFields($element)
     {
-        $productTypeIds = [];
         $fieldsToReturn = [];
-
-        $commerce = Craft::$app->getPlugins()->getPlugin('commerce');
 
         // Get all searchable fields for the sections and entry types we found
         $this->getFieldsForElement($element, $fieldsToReturn);
@@ -231,47 +246,69 @@ class EasySearchService extends Component
             [
                 'handle' => 'billingFirstName',
                 'label' => Craft::t('app', 'Billing: first name'),
+                'isBoolean' => false,
             ],
             [
                 'handle' => 'billingLastName',
                 'label' => Craft::t('app', 'Billing: last name'),
+                'isBoolean' => false,
             ],
             [
                 'handle' => 'billingFullName',
                 'label' => Craft::t('app', 'Billing: full name'),
+                'isBoolean' => false,
             ],
             [
                 'handle' => 'billingPhone',
                 'label' => Craft::t('app', 'Billing: phone'),
+                'isBoolean' => false,
             ],
             [
                 'handle' => 'shippingFirstName',
                 'label' => Craft::t('app', 'Shipping: first name'),
+                'isBoolean' => false,
             ],
             [
                 'handle' => 'shippingLastName',
                 'label' => Craft::t('app', 'Shipping: last name'),
+                'isBoolean' => false,
             ],
             [
                 'handle' => 'shippingFullName',
                 'label' => Craft::t('app', 'Shipping: full name'),
+                'isBoolean' => false,
             ],
             [
                 'handle' => 'shippingPhone',
                 'label' => Craft::t('app', 'Shipping: phone'),
+                'isBoolean' => false,
             ],
             [
                 'handle' => 'transactionReference',
                 'label' => Craft::t('app', 'Transaction reference'),
+                'isBoolean' => false,
             ],
             [
                 'handle' => 'username',
                 'label' => Craft::t('app', 'Username'),
+                'isBoolean' => false,
             ],
             [
                 'handle' => 'skus',
                 'label' => Craft::t('app', 'SKUs'),
+                'isBoolean' => false,
             ],
         ], $fieldsToReturn);
+    }
+
+    protected function valueInArray($value, $key, $array)
+    {
+        foreach ($array as $row) {
+            if ($row[$key] == $value) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

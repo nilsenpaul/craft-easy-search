@@ -21,37 +21,67 @@
       <form class="body">
         <div class="main-container">
           <div class="main">
-            <div v-if="predefinedQueries.length > 0" class="easy-search__hud-queries">
-              <h3 class="heading">{{ getTranslated("Use a predefined query") }}:</h3>
+            <div
+              v-if="predefinedQueries.length > 0"
+              class="easy-search__hud-queries"
+            >
+              <h3 class="heading">
+                {{ getTranslated("Use a predefined query") }}:
+              </h3>
               <div class="input">
                 <div class="select fullwidth">
-                  <select v-on:change="updateSearchInput" v-model="selectedQuery">
-                    <option value>{{ getTranslated('Select a search query') }}</option>
+                  <select
+                    v-on:change="updateSearchInput"
+                    v-model="selectedQuery"
+                  >
+                    <option value>
+                      {{ getTranslated("Select a search query") }}
+                    </option>
                     <option
                       v-for="item in predefinedQueries"
                       v-bind:value="item.query"
-                    >{{ item.label }}</option>
+                    >
+                      {{ item.label }}
+                    </option>
                   </select>
                 </div>
               </div>
             </div>
 
             <div class="easy-search__hud-conditions">
-              <div v-if="selectedQuery !== ''" class="easy-search__hud-hider"></div>
-              <h3
-                class="heading"
-              >{{ predefinedQueries.length > 0 ? getTranslated("... or build one") : getTranslated("Build a search query") }}:</h3>
-              <div v-for="item, i in conditions" class="condition" v-bind:index="i">
+              <div
+                v-if="selectedQuery !== ''"
+                class="easy-search__hud-hider"
+              ></div>
+              <h3 class="heading">
+                {{
+                  predefinedQueries.length > 0
+                    ? getTranslated("... or build one")
+                    : getTranslated("Build a search query")
+                }}:
+              </h3>
+              <div
+                v-for="(item, i) in conditions"
+                class="condition"
+                v-bind:index="i"
+              >
                 <div v-if="i > 0" class="and-or-or">
                   <button
+                    type="button"
                     v-on:click.prevent="removeCondition(i)"
                     class="remove-condition"
-                  >{{ getTranslated('remove') }}</button>
+                    :title="getTranslated('Remove this condition')"
+                  >
+                    {{ getTranslated("remove") }}
+                  </button>
                   <div class="input">
                     <div class="select small">
-                      <select v-on:change="updateSearchInput" v-model="item.andOrOr">
-                        <option value=" ">{{ getTranslated('and') }}</option>
-                        <option value=" OR ">{{ getTranslated('or') }}</option>
+                      <select
+                        v-on:change="updateSearchInput"
+                        v-model="item.andOrOr"
+                      >
+                        <option value=" ">{{ getTranslated("and") }}</option>
+                        <option value=" OR ">{{ getTranslated("or") }}</option>
                       </select>
                     </div>
                   </div>
@@ -59,11 +89,16 @@
                 <div class="field-row">
                   <div class="input">
                     <div class="select fullwidth">
-                      <select v-on:change="updateSearchInput" v-model="item.handle">
+                      <select
+                        v-on:change="updateSearchInput"
+                        v-model="item.handle"
+                      >
                         <option
                           v-for="field in availableFields"
                           v-bind:value="field.handle"
-                        >{{ field.label }}</option>
+                        >
+                          {{ field.label }}
+                        </option>
                       </select>
                     </div>
                   </div>
@@ -72,12 +107,17 @@
                   <div class="flex">
                     <div class="input flex-full">
                       <div class="select fullwidth">
-                        <select v-on:change="updateSearchInput" v-model="item.operator">
+                        <select
+                          v-on:change="updateSearchInput"
+                          v-model="item.operator"
+                        >
                           <option
-                            v-if="!operator.needsSpecificField || item.handle !== '--any--'"
+                            v-if="showOperator(operator, item)"
                             v-for="operator in availableOperators"
                             v-bind:value="operator.key"
-                          >{{ operator.value }}</option>
+                          >
+                            {{ operator.value }}
+                          </option>
                         </select>
                       </div>
                     </div>
@@ -86,14 +126,38 @@
                       v-if="getOperatorByKey(item.operator).needsValueField"
                       class="input input-important"
                     >
-                      <input type="text" v-model="item.value" class="text nicetext fullwidth" />
+                      <input
+                        type="text"
+                        v-model="item.value"
+                        class="text nicetext fullwidth"
+                        v-on:keyup.enter="handleEnter"
+                      />
                     </div>
                   </div>
-                  <button
-                    v-if="conditionIsComplete(conditions.slice(-1)[0]) && i == conditions.length - 1"
-                    v-on:click="addConditionRow"
-                    class="add-btn"
-                  >&plus; {{ getTranslated('Add a condition') }}</button>
+                  <div
+                    class="button-row"
+                    v-if="
+                      conditionIsComplete(conditions.slice(-1)[0]) &&
+                      i == conditions.length - 1
+                    "
+                  >
+                    <button
+                      type="button"
+                      v-on:click="addConditionRow"
+                      class="add-btn"
+                      :title="getTranslated('Add a condition')"
+                    >
+                      &plus;
+                    </button>
+                    <button
+                      type="submit"
+                      v-on:click="toggleHud(false)"
+                      class="submit-btn"
+                      :title="getTranslated('Show the results for this query')"
+                    >
+                      &plus; {{ getTranslated("Show results") }}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -108,7 +172,7 @@
 const defaultConditions = {
   handle: "--any--",
   operator: "contains",
-  value: ""
+  value: "",
 };
 
 export default {
@@ -123,8 +187,8 @@ export default {
       availableFields: [
         {
           handle: "--any--",
-          label: this.getTranslated("Any field")
-        }
+          label: this.getTranslated("Any field"),
+        },
       ],
       availableOperators: [
         {
@@ -133,7 +197,8 @@ export default {
           fieldSearch: "{fieldHandle}:{value}",
           globalSearch: "{value}",
           needsValueField: true,
-          needsSpecificField: false
+          needsSpecificField: false,
+          needsBooleanField: false,
         },
         {
           key: "notContains",
@@ -141,7 +206,8 @@ export default {
           fieldSearch: "-{fieldHandle}:{value}",
           globalSearch: "-{value}",
           needsValueField: true,
-          needsSpecificField: false
+          needsSpecificField: false,
+          needsBooleanField: false,
         },
         {
           key: "equal",
@@ -149,7 +215,8 @@ export default {
           fieldSearch: "{fieldHandle}::{value}",
           globalSearch: '"{value}"',
           needsValueField: true,
-          needsSpecificField: false
+          needsSpecificField: false,
+          needsBooleanField: false,
         },
         {
           key: "notEqual",
@@ -157,29 +224,48 @@ export default {
           fieldSearch: "-{fieldHandle}::{value}",
           globalSearch: '-"{value}"',
           needsValueField: true,
-          needsSpecificField: false
+          needsSpecificField: false,
+          needsBooleanField: false,
         },
         {
           key: "empty",
           value: this.getTranslated("is empty"),
           fieldSearch: "-{fieldHandle}:*",
           needsValueField: false,
-          needsSpecificField: true
+          needsSpecificField: true,
+          needsBooleanField: false,
         },
         {
           key: "notempty",
           value: this.getTranslated("is not empty"),
           fieldSearch: "{fieldHandle}:*",
           needsValueField: false,
-          needsSpecificField: true
-        }
+          needsSpecificField: true,
+          needsBooleanField: false,
+        },
+        {
+          key: "true",
+          value: this.getTranslated("is true"),
+          fieldSearch: "{fieldHandle}:1",
+          needsValueField: false,
+          needsSpecificField: true,
+          needsBooleanField: true,
+        },
+        {
+          key: "false",
+          value: this.getTranslated("is false"),
+          fieldSearch: "-{fieldHandle}:1",
+          needsValueField: false,
+          needsSpecificField: true,
+          needsBooleanField: true,
+        },
       ],
-      conditions: []
+      conditions: [],
     };
   },
-  mounted: function() {
+  mounted: function () {
     var that = this;
-    document.querySelector("body").addEventListener("click", function(event) {
+    document.querySelector("body").addEventListener("click", function (event) {
       if (
         !event.target.closest(".easy-search__container") &&
         !event.target.matches(".add-btn") &&
@@ -192,7 +278,7 @@ export default {
 
     document
       .querySelector(".search .clear")
-      .addEventListener("click", function(event) {
+      .addEventListener("click", function (event) {
         that.resetSearch();
         that.toggleHud(false);
       });
@@ -204,7 +290,10 @@ export default {
     for (let i = 0; i < window.predefinedQueries.length; i++) {
       var queryItem = window.predefinedQueries[i];
 
-      if (queryItem.element === undefined || queryItem.element === this.currentElementType) {
+      if (
+        queryItem.element === undefined ||
+        queryItem.element === this.currentElementType
+      ) {
         this.predefinedQueries.push(queryItem);
       }
     }
@@ -235,6 +324,21 @@ export default {
       Craft.elementIndex.stopSearching();
     },
     updateSearchInput() {
+      for (var i = 0; i < this.conditions.length; i++) {
+        var condition = this.conditions[i];
+        var field = this.getFieldByHandle(condition.handle);
+
+        if (field && field.isBoolean && condition.operator === "contains") {
+          condition.operator = "true";
+        } else if (
+          field &&
+          !field.isBoolean &&
+          (condition.operator === "true" || condition.operator === "false")
+        ) {
+          condition.operator = "contains";
+        }
+      }
+
       var searchQuery = this.buildSearchQuery();
 
       if (searchQuery != this.currentSearchQuery) {
@@ -281,6 +385,36 @@ export default {
 
       return searchQuery;
     },
+    handleEnter(event) {
+      event.stopPropagation();
+
+      this.toggleHud(false);
+    },
+    getFieldByHandle(handle) {
+      for (let i = 0; i < this.availableFields.length; i++) {
+        var field = this.availableFields[i];
+
+        if (field.handle == handle) {
+          return field;
+        }
+      }
+
+      return null;
+    },
+    showOperator(operator, item) {
+      if (operator.needsBooleanField && !this.getIsBooleanField(item.handle)) {
+        return false;
+      } else if (
+        !operator.needsBooleanField &&
+        this.getIsBooleanField(item.handle)
+      ) {
+        return false;
+      } else if (operator.needsSpecificField && item.handle === "--any--") {
+        return false;
+      }
+
+      return true;
+    },
     getOperatorByKey(key) {
       for (let i = 0; i < this.availableOperators.length; i++) {
         var operator = this.availableOperators[i];
@@ -292,6 +426,15 @@ export default {
 
       return null;
     },
+    getIsBooleanField(fieldHandle) {
+      var field = this.getFieldByHandle(fieldHandle);
+
+      if (field) {
+        return field.isBoolean !== undefined && field.isBoolean;
+      }
+
+      return false;
+    },
     getTranslated(string) {
       return Craft.t("easy-search", string);
     },
@@ -300,7 +443,7 @@ export default {
         andOrOr: " ",
         handle: "--any--",
         operator: "contains",
-        value: ""
+        value: "",
       });
     },
     conditionIsComplete(condition) {
@@ -322,11 +465,16 @@ export default {
         elementType != this.currentElementType ||
         source != this.currentSource
       ) {
-        fetch("/actions/easy-search/fields/get-available-fields?elementType=" + elementType + "&source=" + source)
-          .then(response => {
+        fetch(
+          "/actions/easy-search/fields/get-available-fields?elementType=" +
+            elementType +
+            "&source=" +
+            source
+        )
+          .then((response) => {
             return response.json();
           })
-          .then(jsonResponse => {
+          .then((jsonResponse) => {
             this.availableFields = jsonResponse;
           });
       }
@@ -336,7 +484,7 @@ export default {
     },
     removeCondition(index) {
       this.conditions.splice(index, 1);
-    }
-  }
+    },
+  },
 };
 </script>
