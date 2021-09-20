@@ -285,18 +285,7 @@ export default {
 
     // Pre-populate fields
     this.populateAvailableFields();
-
-    // Set predefined queries
-    for (let i = 0; i < window.predefinedQueries.length; i++) {
-      var queryItem = window.predefinedQueries[i];
-
-      if (
-        queryItem.element === undefined ||
-        queryItem.element === this.currentElementType
-      ) {
-        this.predefinedQueries.push(queryItem);
-      }
-    }
+    this.populatePredefinedQueries();
   },
   methods: {
     toggleHud(display = null) {
@@ -311,6 +300,7 @@ export default {
 
       if (display) {
         this.populateAvailableFields();
+        this.populatePredefinedQueries();
         this.updateSearchInput();
       }
     },
@@ -481,6 +471,27 @@ export default {
 
       this.currentElementType = elementType;
       this.currentSource = source;
+    },
+    populatePredefinedQueries() {
+        this.predefinedQueries = [];
+
+        // Set predefined queries
+        for (let i = 0; i < window.predefinedQueries.length; i++) {
+        var queryItem = window.predefinedQueries[i];
+
+        if (
+            (
+                queryItem.element === undefined ||
+                queryItem.element === this.currentElementType
+            )
+            && (
+                queryItem.source === undefined ||
+                queryItem.source === this.currentSource
+            )
+        ) {
+            this.predefinedQueries.push(queryItem);
+        }
+        }
     },
     removeCondition(index) {
       this.conditions.splice(index, 1);

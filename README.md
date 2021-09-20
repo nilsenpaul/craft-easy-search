@@ -35,6 +35,7 @@ return [
       'query' => 'title:*',
       'label' => 'All items with a title',
       'element' => 'craft\\elements\\Entry', // This is optional, and will make Easy Search only show this query on the Entries element index
+      'source' => 'section:3ae083f5-a8c8-4506-b0cb-3f6469bd254d', // Using the UID of a source (prepended by "section:", "group:" or "folder:"), you can limit a predefined query to certain element sources
     ],
     [
       'query' => 'image:*',
