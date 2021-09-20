@@ -1,5 +1,11 @@
 # Easy Search Changelog
 
+## 1.0.3 - 2021-09-20
+### Added
+- Added possibility to limit predefined queries to an element source, such as an entry section, category group or asset folder.
+### Updated
+- Updates JS resources to latest
+
 ## 1.0.2 - 2021-04-20
 ### Added
 - Added the `true` and `false` operators (only visible for lightswitch fields)

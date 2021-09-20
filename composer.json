@@ -2,7 +2,7 @@
     "name": "nilsenpaul/craft-easy-search",
     "description": "Easy Search lets content editors use predefined search queries in Craft's control panel, or 'build' their own.",
     "type": "craft-plugin",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "keywords": [
         "craft",
         "cms",
