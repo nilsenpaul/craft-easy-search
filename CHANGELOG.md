@@ -1,5 +1,10 @@
 # Easy Search Changelog
 
+## Unreleased
+### Added
+- Added `\nilsenpaul\easysearch\services\EasySearchService::EVENT_DEFINE_AVAILABLE_FIELDS` 
+  to allow users to register custom searchable fields
+
 ## 1.0.3 - 2021-09-20
 ### Added
 - Added possibility to limit predefined queries to an element source, such as an entry section, category group or asset folder.
