@@ -2,6 +2,9 @@
 
 Craft's search functionality, powerful as it may be, is not as end user friendly as you'd like it to be. With Easy Search, your content editors can use predefined search queries ("search for all entries with an image field that's not empty") or build their own search query with a user friendly GUI.
 
+### :warning: **This plugin will not be released for Craft 4
+We believe that native element index filtering options in Craft 4, in addition to having the ability to create [custom sources](https://craftcms.com/docs/4.x/entries.html#custom-sources) with filtering applied, makes our plugin obsolete.
+
 ![Easy Search](resources/gif/easy-search.gif)
 
 ## Requirements
