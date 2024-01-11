@@ -4,9 +4,33 @@ namespace nilsenpaul\easysearch\services;
 
 use Craft;
 use craft\base\Component;
+use nilsenpaul\easysearch\events\DefineAvailableFieldsEvent;
 
 class EasySearchService extends Component
 {
+    /**
+     * @event DefineAAvailableFieldsEvent The event that is triggered when defining the available fields shown in the
+     * easy-search "Build a search query" dropdown.
+     *
+     * ```php
+     * Event::on(
+     *     nilsenpaul\easysearch\services\EasySearchService::class,
+     *     nilsenpaul\easysearch\services\EasySearchService::EVENT_DEFINE_AVAILABLE_FIELDS,
+     *     function(nilsenpaul\easysearch\events\DefineAvailableFieldsEvent $event) {
+     *        // Add a custom searchable field, only for User elements
+     *         if ($event->element instanceof \craft\elements\User::class) {
+     *             $event->fields[] = [
+     *                 'handle' => 'customField',
+     *                 'label'  => 'Custom field',
+     *             ];
+     *         }
+     *     }
+     * );
+     * ```
+     *
+     */
+    public const EVENT_DEFINE_AVAILABLE_FIELDS = 'defineAvailableFields';
+
     public function getAvailableFieldsForElementType(String $elementType, String $source)
     {
         $element = new $elementType;
@@ -34,12 +58,21 @@ class EasySearchService extends Component
                     break;
             }
 
-            return array_merge([
+            $fieldsToReturn = array_merge([
                 [
                     'handle' => "--any--",
-                    'label' => Craft::t('easy-search', 'Any field'),
+                    'label'  => Craft::t('easy-search', 'Any field'),
                 ],
             ], $fieldsToReturn);
+
+            $event = new DefineAvailableFieldsEvent([
+                'fields'  => $fieldsToReturn,
+                'element' => $element,
+            ]);
+
+            $this->trigger(self::EVENT_DEFINE_AVAILABLE_FIELDS, $event);
+
+            return $event->fields;
         }
 
         return [];
